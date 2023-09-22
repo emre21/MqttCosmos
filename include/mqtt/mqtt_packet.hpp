@@ -7,16 +7,19 @@
 
 class MqttBasePacket{
 public:
-    const FixedHeader& GetFixedHeader();
-    void SetFixedHeader(const FixedHeader fixedHeader);
-    std::optional<std::size_t> CalculateRemaningLenght(uint8_t byte_0,uint8_t byte_1);
-    std::optional<std::size_t> CalculateRemaningLenght(uint8_t byte_0,uint8_t byte_1,uint8_t byte_2);
-    std::optional<std::size_t> CalculateRemaningLenght(uint8_t byte_0,uint8_t byte_1,uint8_t byte_2,uint8_t byte_3);
-    std::size_t GetRemainingLenght() const ;
-    
+    const FixedHeader& GetFixedHeader() {return fixedHeader_;}
+    void SetFixedHeader(const FixedHeader& fixedHeader) {fixedHeader_ = fixedHeader;}
+    void SetRemainingLenght(std::size_t remainingLength) {remainingLenght_ = remainingLength;}
+    std::size_t GetRemainingLenght() const {return remainingLenght_;}
+
+    virtual void SetPacketData(const std::vector<uint8_t>& packetData) = 0;
+    virtual const std::vector<uint8_t>& GetPacketData() = 0; 
 protected:
     FixedHeader fixedHeader_;
-    std::size_t remainingLenght
+    std::size_t remainingLenght_;
+    std::vector<uint8_t>& packetData_;
+protected:
+    virtual void Parse() = 0;
 };
 
 

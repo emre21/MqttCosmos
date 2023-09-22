@@ -2,12 +2,15 @@
 #define MQTT_DEF_H
 
 #include <cstdint>
-#include <boost/endian.hpp>
-#include "topic.hpp"
 #include <optional>
+#include <vector>
+#include <span>
+#include <boost/endian.hpp>
+
+#include "../topic.hpp"
 
 constexpr auto SIZE_OF_BUINT16 = sizeof(boost::endian::big_uint16_t);
-constexpr auto SIZE_OF_UINT8 = sizeof(boost::endian::big_uint16_t);
+constexpr auto SIZE_OF_UINT8 = sizeof(uint8_t);
 enum class MessageType : uint8_t
 {
     RESERVED_START = 0,
@@ -80,16 +83,12 @@ struct VariableHeader<MessageType::CONNACT>
 template <>
 struct VariableHeader<MessageType::PUBLISH>
 {
-public:
-    VariableHeader(const FixedHeader& fixedHeader,const std::vector<uint8_t>& buffer) {
-        Parse(fixedHeader,buffer);
-    }
     boost::endian::big_uint16_t topicSize;
     Topic topic;
     boost::endian::big_uint16_t messageIdentifier; // it can be optional
     std::size_t payloadStartPos;
-private:
-    void Parse(const FixedHeader& fixedHeader,const std::vector<uint8_t>& buffer) {
+
+void Parse(const FixedHeader& fixedHeader,const std::vector<uint8_t>& buffer) {
         std::memcpy(&topicSize,buffer.data(),SIZE_OF_BUINT16);
         auto topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
         auto topicEndPos = topicStartPos + topicSize.value();
@@ -102,7 +101,7 @@ private:
         }
         
     }
-
+    
 };
 
 template <>
@@ -174,9 +173,9 @@ struct Payload<MessageType::CONNECT>
     ConnectPayloadDataUnit userName;
     ConnectPayloadDataUnit password;
 
-    void Parse(const VariableHeader<MessageType::CONNECT> &variableHeader, const std::vector<uint8_t> &payloadData)
+    void Parse(const VariableHeader<MessageType::CONNECT> &variableHeader, const std::vector<uint8_t>::iterator& payloadDataBeginIt)
     {
-        auto clientID_it = payloadData.cbegin(); 
+        auto clientID_it = payloadDataBeginIt; 
         clientID.Parse(clientID_it);
         
         auto topic_it = clientID_it;
@@ -218,8 +217,8 @@ public:
         uint8_t requestedQos;
     };
 
-    const std::vector<SubscribeDataUnit>& Parse(const std::vector<uint8_t>& buffer) {
-        using buffer_iterator = std::vector<uint8_t>::const_iterator;
+    void Parse(const std::span<uint8_t>& buffer) {
+        using buffer_iterator = std::span<uint8_t>::iterator;
         
         auto UnitParser = [](buffer_iterator begin, boost::endian::big_uint16_t topicLength) -> SubscribeDataUnit {
             auto beginTopic = begin ;
@@ -232,7 +231,7 @@ public:
             };
         };
 
-        auto begin = buffer.cbegin();
+        auto begin = buffer.begin();
         for(std::size_t i = 0 ; i < buffer.size();){
             if (i+SIZE_OF_BUINT16 >= buffer.size()) break;
             boost::endian::big_uint16_t topicLenght;
@@ -241,10 +240,9 @@ public:
             i += SIZE_OF_BUINT16 + topicLenght.value() + SIZE_OF_UINT8;
         }
 
-        return payloadData;
     }
 
-private:
+public:
     std::vector<SubscribeDataUnit> payloadData;
 
 };
@@ -256,7 +254,7 @@ struct Payload<MessageType::SUBACK> {
 
 template <>
 struct Payload<MessageType::PUBLISH> {
-    std::vector<uint8_t> message;
+    std::span<uint8_t> message;
 };
 
 #endif
