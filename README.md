@@ -8,6 +8,7 @@
 * spdlog
 # Note
 * Source code will merged when release version finished
+* dev 0_*_* branches don't ready for compile
 
 # Resources
 * https://mqtt.org/mqtt-specification/
