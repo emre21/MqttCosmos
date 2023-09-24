@@ -88,11 +88,12 @@ struct VariableHeader<MessageType::PUBLISH>
     boost::endian::big_uint16_t messageIdentifier; // it can be optional
     std::size_t payloadStartPos;
 
-void Parse(const FixedHeader& fixedHeader,const std::vector<uint8_t>& buffer) {
+void Parse(const FixedHeader& fixedHeader,std::vector<uint8_t>& buffer) {
         std::memcpy(&topicSize,buffer.data(),SIZE_OF_BUINT16);
-        auto topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
-        auto topicEndPos = topicStartPos + topicSize.value();
-        topic.FromVector(topicSize.value(),topicStartPos,topicEndPos);
+        std::vector<uint8_t>::iterator topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
+        std::vector<uint8_t>::iterator topicEndPos = topicStartPos + topicSize.value();
+        std::span<uint8_t> bufferRef(topicStartPos,topicEndPos);
+        topic.FromSpan(bufferRef);
         if (fixedHeader.qosLevel == 1 || fixedHeader.qosLevel == 2 ) {
             std::memcpy(&messageIdentifier,topicEndPos.base(),SIZE_OF_BUINT16);
             payloadStartPos = SIZE_OF_BUINT16 + topicSize.value() + SIZE_OF_BUINT16;
@@ -217,16 +218,17 @@ public:
         uint8_t requestedQos;
     };
 
-    void Parse(const std::span<uint8_t>& buffer) {
+    void Parse(std::span<uint8_t>& buffer) {
         using buffer_iterator = std::span<uint8_t>::iterator;
         
         auto UnitParser = [](buffer_iterator begin, boost::endian::big_uint16_t topicLength) -> SubscribeDataUnit {
             auto beginTopic = begin ;
             auto endTopic = beginTopic + topicLength.value();
             auto requestedQos = *(endTopic + SIZE_OF_UINT8);
+            std::span<uint8_t> topic(beginTopic,endTopic);
             return SubscribeDataUnit{
                 topicLength,
-                Topic(topicLength.value(),beginTopic, endTopic),
+                Topic(topic),
                 requestedQos
             };
         };

@@ -17,7 +17,7 @@ public:
 protected:
     FixedHeader fixedHeader_;
     std::size_t remainingLenght_;
-    std::vector<uint8_t>& packetData_;
+    std::vector<uint8_t> packetData_;
 protected:
     virtual void Parse() = 0;
 };

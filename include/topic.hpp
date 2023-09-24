@@ -4,32 +4,32 @@
 #include <vector>
 #include <string>
 #include <span>
+#include <cstdlib>
 class Topic{
 public:
     Topic() = default; 
-    Topic(const std::size_t& topicSize,std::vector<uint8_t>::iterator begin,
-        std::vector<uint8_t>::iterator end) 
+    Topic(const std::size_t& topicSize,std::vector<uint8_t>::iterator& begin,
+        std::vector<uint8_t>::iterator& end) 
     {
-        FromVector(topicSize,begin,end);
+        FromVector(begin,end);
     }
-    Topic(const std::size_t& topicSize,std::span<uint8_t>::iterator begin,
-        std::span<uint8_t>::iterator end) 
+    Topic(const std::span<uint8_t>& bufferRef) 
     {
-        FromVector(topicSize,begin,end);
+        FromSpan(bufferRef);
     }
     virtual ~Topic() = default;
 
-    void FromVector(const std::size_t& topicSize,std::vector<uint8_t>::const_iterator begin,
-        std::vector<uint8_t>::const_iterator end) 
+    void FromVector(const std::vector<uint8_t>::iterator& begin,
+        const std::vector<uint8_t>::iterator& end) 
     {
-        topic_name.reserve(topicSize);
-        std::copy(begin,end,topic_name);
+        topic_name.resize(std::distance(begin,end));
+        std::copy(begin,end,topic_name.begin());
+        
     }
-    void FromVector(const std::size_t& topicSize,std::span<uint8_t>::iterator begin,
-        std::span<uint8_t>::iterator end) 
+    void FromSpan(const std::span<uint8_t>& bufferRef) 
     {
-        topic_name.reserve(topicSize);
-        std::copy(begin,end,topic_name);
+        topic_name.resize(bufferRef.size());
+        std::copy(bufferRef.begin(),bufferRef.end(),topic_name.begin());
     }
     const std::u8string& GetTopicName() {return topic_name;}
 private:

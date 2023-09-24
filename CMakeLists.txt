@@ -18,6 +18,8 @@ set(MQTT_COSMOS_SRC
 
 project({PROJ_NAME})
 
+
+
 find_package(Boost REQUIRED)
 find_package(spdlog REQUIRED)
 
@@ -29,5 +31,5 @@ include_directories(
 
 add_executable(${PROJ_NAME} ${MQTT_COSMOS_SRC})
 target_link_libraries(${PROJ_NAME} ${Boost_LIBRARY_DIR} spdlog::spdlog)
-
+add_subdirectory(test)
 

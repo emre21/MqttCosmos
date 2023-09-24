@@ -5,7 +5,7 @@
 #include "mqtt_packet.hpp"
 
 
-class MqttConnectPacket : private MqttBasePacket{
+class MqttConnectPacket : public MqttBasePacket{
 public:
     std::optional<std::u8string> GetUserName() const;
     std::optional<std::u8string> GetPassword() const;
