@@ -8,16 +8,22 @@
 class Topic{
 public:
     Topic() = default; 
+    /*
     Topic(const std::size_t& topicSize,std::vector<uint8_t>::iterator& begin,
         std::vector<uint8_t>::iterator& end) 
     {
         FromVector(begin,end);
     }
-    Topic(const std::span<uint8_t>& bufferRef) 
+    */
+    explicit Topic(const std::span<uint8_t>& bufferRef) noexcept 
     {
         FromSpan(bufferRef);
     }
     virtual ~Topic() = default;
+
+    bool operator==(const Topic& other) const {
+        return other.topic_name == this->topic_name; 
+    }
 
     void FromVector(const std::vector<uint8_t>::iterator& begin,
         const std::vector<uint8_t>::iterator& end) 
@@ -31,9 +37,15 @@ public:
         topic_name.resize(bufferRef.size());
         std::copy(bufferRef.begin(),bufferRef.end(),topic_name.begin());
     }
-    const std::u8string& GetTopicName() {return topic_name;}
+    const std::u8string& GetTopicName() const {return topic_name;}
 private:
     std::u8string topic_name;
+};
+
+struct TopicHasher{
+    std::size_t operator()(const Topic& topic) const {
+        return std::hash<std::u8string>{}(topic.GetTopicName());
+    }
 };
 
 #endif

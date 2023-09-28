@@ -7,6 +7,7 @@ set(MQTT_COSMOS_INC_DIRS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mqtt")
 set(MQTT_COSMOS_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(MQTT_COSMOS_SRC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/mqtt/mqtt_helper_funcs.hpp
     ${MQTT_COSMOS_SRC_DIR}/main.cpp
     ${MQTT_COSMOS_SRC_DIR}/connection.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_helper_funcs.cpp

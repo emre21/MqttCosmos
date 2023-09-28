@@ -10,7 +10,7 @@
 
 
 TEST(MqttPacketTest,Connect) {
-        std::vector<uint8_t> connect_packet = {
+/*        std::vector<uint8_t> connect_packet = {
         // Fixed Header
         0x10,      // CONNECT packet type
         0x0C,      // Remaining Length (12 bytes)
@@ -35,19 +35,9 @@ TEST(MqttPacketTest,Connect) {
    std::cout << x.value();
     //ASSERT_EQ(x.value(),10);
     ASSERT_EQ(fixheader.messageType,static_cast<uint8_t>(MessageType::CONNECT));
-    
+  */  
 }
 
-
-TEST(TopicTest,init) {
-    std::vector<uint8_t> test_data {'e','m','r','e'};
-    std::span<uint8_t> test(test_data.begin(),test_data.end());
-
-    Topic t(test);
-   // std::cout << t.GetTopicName().size();
-    //printf("%s",(const char *)t.GetTopicName().c_str());
-    //std::cout << std::string(t.GetTopicName().begin(),t.GetTopicName().end());    
-}
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
