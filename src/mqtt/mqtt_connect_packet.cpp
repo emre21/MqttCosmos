@@ -1,4 +1,17 @@
 #include "mqtt_connect_packet.hpp"
+#include <spdlog/spdlog.h>
+#include <iostream>
+#include <boost/endian/conversion.hpp>
+MqttConnectPacket::MqttConnectPacket(FixedHeader header, const std::span<uint8_t> &buffer)
+    : MqttBasePacket(header,buffer)
+{
+    std::cout << "->" << std::endl;
+    for (const auto& i : buffer) {
+        std::cout << "->" << i;
+    }
+    std::cout << "->" << std::endl;
+    Parse();
+}
 
 std::optional<std::u8string> MqttConnectPacket::GetUserName() const
 {
@@ -27,15 +40,15 @@ std::optional<std::u8string> MqttConnectPacket::GetClientId() const
 
 uint16_t MqttConnectPacket::GetKeepAliveTimerSeconds()
 {
-    return variableHeader_.keepAliveTimer.value();
+    return ConverToUint16(variableHeader_.keepAliveTimer);
 }
 
-void MqttConnectPacket::SetPacketData(const std::vector<uint8_t> &packetData)
+void MqttConnectPacket::SetPacketData(const std::span<uint8_t> &packetData)
 {
-    packetData_ = packetData_;
+    //packetData_ = packetData;
 }
 
-const std::vector<uint8_t> &MqttConnectPacket::GetPacketData()
+const std::span<uint8_t> &MqttConnectPacket::GetPacketData()
 {
     return packetData_;
 }
@@ -43,7 +56,18 @@ const std::vector<uint8_t> &MqttConnectPacket::GetPacketData()
 void MqttConnectPacket::Parse()
 {
     const auto sizeOfPacket = packetData_.size();
+    spdlog::info("connect packet size without fixheader {}",sizeOfPacket);
     const auto sizeofVariableHeader = sizeof(variableHeader_);
+    spdlog::info("connect packet variable header size {}",sizeofVariableHeader);
     std::memcpy(&variableHeader_,packetData_.data(),sizeofVariableHeader);
-    payload_.Parse(variableHeader_,packetData_.begin()+sizeofVariableHeader);
+    std::cout << "->" << std::endl;
+    for (const auto& i : packetData_) {
+        std::cout << "->" << i;
+    }
+    std::cout << "->" << std::endl;
+    std::cout <<"-------+" <<std::string(variableHeader_.protocolName)<<'\n';
+    std::cout <<"-------+" <<int(variableHeader_.keepAliveTimer.value())<<'\n';
+
+    std::span<uint8_t> payloadBuffer(packetData_.begin()+sizeofVariableHeader,packetData_.end());
+    payload_.Parse(variableHeader_,payloadBuffer);
 }

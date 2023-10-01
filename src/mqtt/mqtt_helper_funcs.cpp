@@ -2,11 +2,12 @@
 
 std::optional<std::size_t> CalculateRemaningLenght(uint8_t byte_0)
 {
-    if (byte_0 >= LIMIT_UNIT_REMAINIG ) {
+    auto size = static_cast<std::size_t>(byte_0);
+    if (size >= LIMIT_UNIT_REMAINIG ) {
         return std::nullopt;
     }
 
-    return static_cast<std::size_t>(byte_0);
+    return size;
 }
 
 std::optional<std::size_t> CalculateRemaningLenght(uint8_t byte_0, uint8_t byte_1)

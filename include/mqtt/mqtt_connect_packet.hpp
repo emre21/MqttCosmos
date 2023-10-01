@@ -7,6 +7,7 @@
 
 class MqttConnectPacket : public MqttBasePacket{
 public:
+    MqttConnectPacket(FixedHeader header,const std::span<uint8_t>& buffer);
     std::optional<std::u8string> GetUserName() const;
     std::optional<std::u8string> GetPassword() const;
     std::optional<std::u8string> GetMessage() const;
@@ -14,8 +15,8 @@ public:
     std::optional<std::u8string> GetClientId() const;
     uint16_t GetKeepAliveTimerSeconds();
     
-    void SetPacketData(const std::vector<uint8_t>& packetData) override;
-    const std::vector<uint8_t>& GetPacketData() override; 
+    void SetPacketData(const std::span<uint8_t>& packetData) override;
+    const std::span<uint8_t>& GetPacketData() override; 
 
 private:
     void Parse() override;

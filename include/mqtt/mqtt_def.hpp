@@ -6,7 +6,8 @@
 #include <vector>
 #include <span>
 #include <boost/endian.hpp>
-
+#include "mqtt_helper_funcs.hpp"
+#include <iostream>
 #include "../topic.hpp"
 
 constexpr auto SIZE_OF_BUINT16 = sizeof(boost::endian::big_uint16_t);
@@ -91,14 +92,14 @@ struct VariableHeader<MessageType::PUBLISH>
 void Parse(const FixedHeader& fixedHeader,std::vector<uint8_t>& buffer) {
         std::memcpy(&topicSize,buffer.data(),SIZE_OF_BUINT16);
         std::vector<uint8_t>::iterator topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
-        std::vector<uint8_t>::iterator topicEndPos = topicStartPos + topicSize.value();
+        std::vector<uint8_t>::iterator topicEndPos = topicStartPos + ConverToUint16(topicSize);
         std::span<uint8_t> bufferRef(topicStartPos,topicEndPos);
         topic.FromSpan(bufferRef);
         if (fixedHeader.qosLevel == 1 || fixedHeader.qosLevel == 2 ) {
             std::memcpy(&messageIdentifier,topicEndPos.base(),SIZE_OF_BUINT16);
-            payloadStartPos = SIZE_OF_BUINT16 + topicSize.value() + SIZE_OF_BUINT16;
+            payloadStartPos = SIZE_OF_BUINT16 + ConverToUint16(topicSize) + SIZE_OF_BUINT16;
         } else {
-            payloadStartPos = SIZE_OF_BUINT16 + topicSize.value();
+            payloadStartPos = SIZE_OF_BUINT16 + ConverToUint16(topicSize);
         }
         
     }
@@ -159,12 +160,19 @@ struct Payload<MessageType::CONNECT>
     struct ConnectPayloadDataUnit{
         boost::endian::big_uint16_t dataSizeDescriptor = 0;
         std::optional<std::u8string> data = std::nullopt;
-        void Parse(std::vector<uint8_t>::const_iterator begin) {
+        void Parse(const std::span<uint8_t>::iterator& begin) {
             std::memcpy(&dataSizeDescriptor,begin.base(),SIZE_OF_BUINT16);
-            if (dataSizeDescriptor.value() == 0) {
+            if (ConverToUint16(dataSizeDescriptor) == 0) {
                 data = std::nullopt;
             }
-            data.emplace(begin+SIZE_OF_BUINT16,begin+SIZE_OF_BUINT16+dataSizeDescriptor.value());
+            std::cout << '\n' << "Data size desc :" << ConverToUint16(dataSizeDescriptor) << '\n';
+            data.emplace(begin+SIZE_OF_BUINT16,begin+SIZE_OF_BUINT16+ConverToUint16(dataSizeDescriptor));
+            if(data.has_value()) {
+                printf("%s",(const char*)data.value().c_str());
+            }
+            else {
+                printf("EMRE CANNOT CREATE CLIENT ID");
+            }
         }
     };
 
@@ -174,14 +182,15 @@ struct Payload<MessageType::CONNECT>
     ConnectPayloadDataUnit userName;
     ConnectPayloadDataUnit password;
 
-    void Parse(const VariableHeader<MessageType::CONNECT> &variableHeader, const std::vector<uint8_t>::iterator& payloadDataBeginIt)
+    void Parse(const VariableHeader<MessageType::CONNECT> &variableHeader, const std::span<uint8_t>& payloadData)
     {
-        auto clientID_it = payloadDataBeginIt; 
+        auto clientID_it = payloadData.begin();
+        std::cout << "Dataszie desc calclualte  :: " << payloadData[1] + ((uint16_t)payloadData[0] << 8);
         clientID.Parse(clientID_it);
         
         auto topic_it = clientID_it;
         if (variableHeader.ConnectFlags.Bits.willFlag) {
-            topic_it = clientID_it + clientID.dataSizeDescriptor.value() + SIZE_OF_BUINT16;
+            topic_it = clientID_it + ConverToUint16(clientID.dataSizeDescriptor) + SIZE_OF_BUINT16;
             topic.Parse(topic_it);
         }
 
@@ -190,19 +199,19 @@ struct Payload<MessageType::CONNECT>
                             variableHeader.ConnectFlags.Bits.willQos && 
                             !variableHeader.ConnectFlags.Bits.willRetain;
         if (hasMessage) {
-            message_it = topic_it + topic.dataSizeDescriptor.value() + SIZE_OF_BUINT16;
+            message_it = topic_it + ConverToUint16(topic.dataSizeDescriptor) + SIZE_OF_BUINT16;
             message.Parse(message_it);
         }
 
         auto userName_it = message_it;
         if (variableHeader.ConnectFlags.Bits.userNameFlag) {
-            userName_it = message_it + message.dataSizeDescriptor.value() + SIZE_OF_BUINT16;
+            userName_it = message_it + ConverToUint16(message.dataSizeDescriptor) + SIZE_OF_BUINT16;
             userName.Parse(userName_it);
         }
 
         auto password_it = userName_it;
         if (variableHeader.ConnectFlags.Bits.passwordFlag) {
-            password_it = userName_it + userName.dataSizeDescriptor.value() + SIZE_OF_BUINT16;
+            password_it = userName_it + ConverToUint16(userName.dataSizeDescriptor) + SIZE_OF_BUINT16;
             password.Parse(password_it);
         }
     }
@@ -223,7 +232,7 @@ public:
         
         auto UnitParser = [](buffer_iterator begin, boost::endian::big_uint16_t topicLength) -> SubscribeDataUnit {
             auto beginTopic = begin ;
-            auto endTopic = beginTopic + topicLength.value();
+            auto endTopic = beginTopic + ConverToUint16(topicLength);
             auto requestedQos = *(endTopic + SIZE_OF_UINT8);
             std::span<uint8_t> topic(beginTopic,endTopic);
             return SubscribeDataUnit{
@@ -239,7 +248,7 @@ public:
             boost::endian::big_uint16_t topicLenght;
             std::memcpy(&topicLenght,&buffer[i],SIZE_OF_BUINT16);
             payloadData.push_back(UnitParser(begin,topicLenght));
-            i += SIZE_OF_BUINT16 + topicLenght.value() + SIZE_OF_UINT8;
+            i += SIZE_OF_BUINT16 + ConverToUint16(topicLenght) + SIZE_OF_UINT8;
         }
 
     }

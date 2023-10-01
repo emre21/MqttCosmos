@@ -3,17 +3,19 @@
 #include <span>
 
 #include "mqtt_def.hpp"
-//#include "mqtt_connect_packet.hpp"
+#include "mqtt_connect_packet.hpp"
 #include "topic.hpp"
 #include "mqtt_helper_funcs.hpp"
+
 #include <optional>
 
 
+
 TEST(MqttPacketTest,Connect) {
-/*        std::vector<uint8_t> connect_packet = {
+        std::vector<uint8_t> connect_packet = {
         // Fixed Header
         0x10,      // CONNECT packet type
-        0x0C,      // Remaining Length (12 bytes)
+        0x17,      // Remaining Length (12 bytes)
 
         // Variable Header
         0x00,      // Protocol Name Length MSB
@@ -25,17 +27,26 @@ TEST(MqttPacketTest,Connect) {
         0x00,      // Keep Alive LSB (60 seconds)
 
         // Payload
-        0x00,      // Client Identifier Length MSB
-        0x08,      // Client Identifier Length LSB
+        0x09,      // Client Identifier Length MSB
+        0x00,      // Client Identifier Length LSB
         'm', 'y', '_', 'c', 'l', 'i', 'e', 'n', 't'  // Client Identifier: "my_client"
     };
     FixedHeader fixheader;
-    std::memcpy(&fixheader,connect_packet.data(),sizeof(fixheader));  
+    std::memcpy(&fixheader,connect_packet.data(),sizeof(fixheader));
+
     auto x = CalculateRemaningLenght(fixheader.remainingLength);
-   std::cout << x.value();
-    //ASSERT_EQ(x.value(),10);
+    std::cout <<connect_packet.size()<<"--"<<x.value();
+    ASSERT_EQ(x.value(),connect_packet.size() -2 );
     ASSERT_EQ(fixheader.messageType,static_cast<uint8_t>(MessageType::CONNECT));
-  */  
+
+    std::span<uint8_t> connect_buffer(connect_packet.begin()+2,connect_packet.end());
+
+    MqttConnectPacket packet(fixheader,connect_buffer);
+    ASSERT_EQ(60,packet.GetKeepAliveTimerSeconds());
+    ASSERT_TRUE(u8"my_client"==packet.GetClientId().value());
+    
+    
+    
 }
 
 int main(int argc, char **argv) {

@@ -1,9 +1,11 @@
 #include "mqtt_subscribe_packet.hpp"
+#include "mqtt_helper_funcs.hpp"
 #include <ranges>
 
 uint16_t MqttSubscribePacket::GetMessageIdentifier()
 {
-    return variableHeader_.messageIdentifier.value();
+    return ConverToUint16(variableHeader_.messageIdentifier);
+    //return variableHeader_.messageIdentifier.value();
 }
 
 
