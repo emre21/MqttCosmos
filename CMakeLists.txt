@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 
+
+set(BOOST_ROOT "C:\\Development\\ThirdpartyLibs\\boost_1_83_0")
+set(BOOST_INCLUDEDIR "C:\\Development\\ThirdpartyLibs\\boost_1_83_0\\boost")
+set(BOOST_LIBRARYDIR "C:\\Development\\ThirdpartyLibs\\boost_1_83_0\\lib64-msvc-14.3")
+set(spdlog_DIR "C:\\Development\\ThirdpartyLibs\\spdlog\\build")
+
 set(CMAKE_CXX_STANDARD 20)
 set(PROJ_NAME "MqttCosmos")
 set(MQTT_COSMOS_INC_DIRS 
@@ -22,6 +28,11 @@ project({PROJ_NAME})
 
 
 find_package(Boost REQUIRED)
+if (Boost_FOUND)
+    message("Founded boost")
+endif()
+
+
 find_package(spdlog REQUIRED)
 
 include_directories(
@@ -31,6 +42,8 @@ include_directories(
 
 
 add_executable(${PROJ_NAME} ${MQTT_COSMOS_SRC})
-target_link_libraries(${PROJ_NAME} ${Boost_LIBRARY_DIR} spdlog::spdlog)
+target_link_libraries(${PROJ_NAME} ${Boost_LIBRARY_DIR} spdlog::spdlog) 
+#
+
 add_subdirectory(test)
 

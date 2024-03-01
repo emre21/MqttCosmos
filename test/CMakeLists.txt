@@ -1,7 +1,13 @@
 project(MQTT_COSMOS_TEST)
 
-
-
+set(GTEST_LIBRARY "C:\\Development\\ThirdpartyLibs\\googletest")
+set(GTEST_INCLUDE_DIR "C:\\Development\\ThirdpartyLibs\\googletest\\googletest\\include")
+#set(GTEST_MAIN_LIBRARY "C:\\Development\\ThirdpartyLibs\\googletest\\build")
+#set(GTEST_ROOT "C:\\Development\\ThirdpartyLibs\\googletest\\build")
+find_package(gtest REQUIRED)
+include_directories(
+	${GTEST_INCLUDE_DIR}
+)
 add_executable(mqtt_cosmos_test
 "${CMAKE_CURRENT_SOURCE_DIR}/../include/mqtt/mqtt_helper_funcs.hpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../include/mqtt/mqtt_packet.hpp"
