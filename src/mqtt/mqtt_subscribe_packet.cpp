@@ -18,13 +18,13 @@ std::vector<std::pair<Topic,uint8_t>> MqttSubscribePacket::GetSubcribeDatas()
     return datas;
 }
 
-void MqttSubscribePacket::SetPacketData(const std::vector<uint8_t> &packetData)
+void MqttSubscribePacket::SetPacketData(const std::span<uint8_t> &packetData)
 {
     packetData_ = packetData;
     Parse();
 }
 
-const std::vector<uint8_t> &MqttSubscribePacket::GetPacketData()
+const std::span<uint8_t> &MqttSubscribePacket::GetPacketData()
 {
     return packetData_;
 }

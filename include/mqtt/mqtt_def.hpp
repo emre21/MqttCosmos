@@ -1,14 +1,14 @@
 #ifndef MQTT_DEF_H
 #define MQTT_DEF_H
 
-#include <cstdint>
-#include <optional>
-#include <vector>
-#include <span>
-#include <boost/endian.hpp>
-#include "mqtt_helper_funcs.hpp"
-#include <iostream>
 #include "../topic.hpp"
+#include "mqtt_helper_funcs.hpp"
+#include <boost/endian.hpp>
+#include <cstdint>
+#include <iostream>
+#include <optional>
+#include <span>
+#include <vector>
 
 constexpr auto SIZE_OF_BUINT16 = sizeof(boost::endian::big_uint16_t);
 constexpr auto SIZE_OF_UINT8 = sizeof(uint8_t);
@@ -30,7 +30,6 @@ enum class MessageType : uint8_t
     PINGRESP,
     DISCONNECT,
     Reserved_END = 15,
-
 };
 
 struct FixedHeader
@@ -42,20 +41,16 @@ struct FixedHeader
     uint8_t remainingLength;
 };
 
-template <MessageType Type>
-struct VariableHeader
+template <MessageType Type> struct VariableHeader
 {
 };
 
-
-template <>
-struct VariableHeader<MessageType::CONNECT>
+template <> struct VariableHeader<MessageType::CONNECT>
 {
     boost::endian::big_uint16_t sizeOfProtocolName; // delete for mosquitto and paho libraries
     char protocolName[6];
     uint8_t protocolVersion;
-    union ConnectFlags
-    {
+    union ConnectFlags {
         uint8_t connectFlags;
         struct connectFlagsBits
         {
@@ -67,110 +62,104 @@ struct VariableHeader<MessageType::CONNECT>
             uint8_t willFlag : 1;
             uint8_t cleanSession : 1;
         } Bits;
-    }ConnectFlags;
+    } ConnectFlags;
     boost::endian::big_uint16_t keepAliveTimer;
 };
 
 // Variable Headers
 
-template <>
-struct VariableHeader<MessageType::CONNACT>
+template <> struct VariableHeader<MessageType::CONNACT>
 {
     uint8_t reserved;
     uint8_t returnCode;
 };
 
-
-template <>
-struct VariableHeader<MessageType::PUBLISH>
+template <> struct VariableHeader<MessageType::PUBLISH>
 {
     boost::endian::big_uint16_t topicSize;
     Topic topic;
     boost::endian::big_uint16_t messageIdentifier; // it can be optional
     std::size_t payloadStartPos;
 
-void Parse(const FixedHeader& fixedHeader,std::vector<uint8_t>& buffer) {
-        std::memcpy(&topicSize,buffer.data(),SIZE_OF_BUINT16);
-        std::vector<uint8_t>::iterator topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
-        std::vector<uint8_t>::iterator topicEndPos = topicStartPos + ConverToUint16(topicSize);
-        std::span<uint8_t> bufferRef(topicStartPos,topicEndPos);
+    void Parse(const FixedHeader &fixedHeader, std::span<uint8_t> &buffer)
+    {
+        std::memcpy(&topicSize, buffer.data(), SIZE_OF_BUINT16);
+        std::span<uint8_t>::iterator topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
+        std::span<uint8_t>::iterator topicEndPos = topicStartPos + ConverToUint16(topicSize);
+        std::span<uint8_t> bufferRef(topicStartPos, topicEndPos);
         topic.FromSpan(bufferRef);
-        if (fixedHeader.qosLevel == 1 || fixedHeader.qosLevel == 2 ) {
-            std::memcpy(&messageIdentifier,topicEndPos.base(),SIZE_OF_BUINT16);
+        if (fixedHeader.qosLevel == 1 || fixedHeader.qosLevel == 2)
+        {
+            std::memcpy(&messageIdentifier, topicEndPos._Mybegin, SIZE_OF_BUINT16);
             payloadStartPos = SIZE_OF_BUINT16 + ConverToUint16(topicSize) + SIZE_OF_BUINT16;
-        } else {
+        }
+        else
+        {
             payloadStartPos = SIZE_OF_BUINT16 + ConverToUint16(topicSize);
         }
-        
     }
-    
 };
 
-template <>
-struct VariableHeader<MessageType::PUBACK>
+template <> struct VariableHeader<MessageType::PUBACK>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
-template <>
-struct VariableHeader<MessageType::PUBREC>
+template <> struct VariableHeader<MessageType::PUBREC>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
-template <>
-struct VariableHeader<MessageType::PUBREL>
+template <> struct VariableHeader<MessageType::PUBREL>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
-template <>
-struct VariableHeader<MessageType::PUBCOMP>
+template <> struct VariableHeader<MessageType::PUBCOMP>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
-template <>
-struct VariableHeader<MessageType::SUBSCRIBE>
+template <> struct VariableHeader<MessageType::SUBSCRIBE>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
-template <>
-struct VariableHeader<MessageType::UNSUBSCRIBE>
+template <> struct VariableHeader<MessageType::UNSUBSCRIBE>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
-template <>
-struct VariableHeader<MessageType::UNSUBACK>
+template <> struct VariableHeader<MessageType::UNSUBACK>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
 
-template <>
-struct VariableHeader<MessageType::SUBACK>
+template <> struct VariableHeader<MessageType::SUBACK>
 {
     boost::endian::big_uint16_t messageIdentifier;
 };
 
 // Payloads
-template <MessageType Type>
-struct Payload
+template <MessageType Type> struct Payload
 {
 };
 
-template <>
-struct Payload<MessageType::CONNECT>
+template <> struct Payload<MessageType::CONNECT>
 {
-    struct ConnectPayloadDataUnit{
+    struct ConnectPayloadDataUnit
+    {
         boost::endian::big_uint16_t dataSizeDescriptor = 0;
         std::optional<std::u8string> data = std::nullopt;
-        void Parse(const std::span<uint8_t>::iterator& begin) {
-            std::memcpy(&dataSizeDescriptor,begin.base(),SIZE_OF_BUINT16);
-            if (ConverToUint16(dataSizeDescriptor) == 0) {
+        void Parse(const std::span<uint8_t>::iterator &begin)
+        {
+            std::memcpy(&dataSizeDescriptor, begin._Myptr, SIZE_OF_BUINT16);
+            if (ConverToUint16(dataSizeDescriptor) == 0)
+            {
                 data = std::nullopt;
             }
             std::cout << '\n' << "Data size desc :" << ConverToUint16(dataSizeDescriptor) << '\n';
-            data.emplace(begin+SIZE_OF_BUINT16,begin+SIZE_OF_BUINT16+ConverToUint16(dataSizeDescriptor));
-            if(data.has_value()) {
-                printf("%s",(const char*)data.value().c_str());
+            data.emplace(begin + SIZE_OF_BUINT16, begin + SIZE_OF_BUINT16 + ConverToUint16(dataSizeDescriptor));
+            if (data.has_value())
+            {
+                printf("%s", (const char *)data.value().c_str());
             }
-            else {
+            else
+            {
                 printf("EMRE CANNOT CREATE CLIENT ID");
             }
         }
@@ -182,89 +171,89 @@ struct Payload<MessageType::CONNECT>
     ConnectPayloadDataUnit userName;
     ConnectPayloadDataUnit password;
 
-    void Parse(const VariableHeader<MessageType::CONNECT> &variableHeader, const std::span<uint8_t>& payloadData)
+    void Parse(const VariableHeader<MessageType::CONNECT> &variableHeader, const std::span<uint8_t> &payloadData)
     {
         auto clientID_it = payloadData.begin();
         std::cout << "Dataszie desc calclualte  :: " << payloadData[1] + ((uint16_t)payloadData[0] << 8);
         clientID.Parse(clientID_it);
-        
+
         auto topic_it = clientID_it;
-        if (variableHeader.ConnectFlags.Bits.willFlag) {
+        if (variableHeader.ConnectFlags.Bits.willFlag)
+        {
             topic_it = clientID_it + ConverToUint16(clientID.dataSizeDescriptor) + SIZE_OF_BUINT16;
             topic.Parse(topic_it);
         }
 
         auto message_it = topic_it;
-        auto hasMessage = variableHeader.ConnectFlags.Bits.willFlag && 
-                            variableHeader.ConnectFlags.Bits.willQos && 
-                            !variableHeader.ConnectFlags.Bits.willRetain;
-        if (hasMessage) {
+        auto hasMessage = variableHeader.ConnectFlags.Bits.willFlag && variableHeader.ConnectFlags.Bits.willQos &&
+                          !variableHeader.ConnectFlags.Bits.willRetain;
+        if (hasMessage)
+        {
             message_it = topic_it + ConverToUint16(topic.dataSizeDescriptor) + SIZE_OF_BUINT16;
             message.Parse(message_it);
         }
 
         auto userName_it = message_it;
-        if (variableHeader.ConnectFlags.Bits.userNameFlag) {
+        if (variableHeader.ConnectFlags.Bits.userNameFlag)
+        {
             userName_it = message_it + ConverToUint16(message.dataSizeDescriptor) + SIZE_OF_BUINT16;
             userName.Parse(userName_it);
         }
 
         auto password_it = userName_it;
-        if (variableHeader.ConnectFlags.Bits.passwordFlag) {
+        if (variableHeader.ConnectFlags.Bits.passwordFlag)
+        {
             password_it = userName_it + ConverToUint16(userName.dataSizeDescriptor) + SIZE_OF_BUINT16;
             password.Parse(password_it);
         }
     }
-
 };
 
-template <>
-struct Payload<MessageType::SUBSCRIBE> {
-public:
-    struct SubscribeDataUnit{
+template <> struct Payload<MessageType::SUBSCRIBE>
+{
+  public:
+    struct SubscribeDataUnit
+    {
         boost::endian::big_uint16_t topicLength;
         Topic topic;
         uint8_t requestedQos;
     };
 
-    void Parse(std::span<uint8_t>& buffer) {
+    void Parse(std::span<uint8_t> &buffer)
+    {
         using buffer_iterator = std::span<uint8_t>::iterator;
-        
+
         auto UnitParser = [](buffer_iterator begin, boost::endian::big_uint16_t topicLength) -> SubscribeDataUnit {
-            auto beginTopic = begin ;
+            auto beginTopic = begin;
             auto endTopic = beginTopic + ConverToUint16(topicLength);
             auto requestedQos = *(endTopic + SIZE_OF_UINT8);
-            std::span<uint8_t> topic(beginTopic,endTopic);
-            return SubscribeDataUnit{
-                topicLength,
-                Topic(topic),
-                requestedQos
-            };
+            std::span<uint8_t> topic(beginTopic, endTopic);
+            return SubscribeDataUnit{topicLength, Topic(topic), requestedQos};
         };
 
         auto begin = buffer.begin();
-        for(std::size_t i = 0 ; i < buffer.size();){
-            if (i+SIZE_OF_BUINT16 >= buffer.size()) break;
+        for (std::size_t i = 0; i < buffer.size();)
+        {
+            if (i + SIZE_OF_BUINT16 >= buffer.size())
+                break;
             boost::endian::big_uint16_t topicLenght;
-            std::memcpy(&topicLenght,&buffer[i],SIZE_OF_BUINT16);
-            payloadData.push_back(UnitParser(begin,topicLenght));
+            std::memcpy(&topicLenght, &buffer[i], SIZE_OF_BUINT16);
+            payloadData.push_back(UnitParser(begin, topicLenght));
             i += SIZE_OF_BUINT16 + ConverToUint16(topicLenght) + SIZE_OF_UINT8;
         }
-
     }
 
-public:
+  public:
     std::vector<SubscribeDataUnit> payloadData;
-
 };
 
-template <>
-struct Payload<MessageType::SUBACK> {
+template <> struct Payload<MessageType::SUBACK>
+{
     uint8_t qosLevel;
 };
 
-template <>
-struct Payload<MessageType::PUBLISH> {
+template <> struct Payload<MessageType::PUBLISH>
+{
     std::span<uint8_t> message;
 };
 

@@ -1,5 +1,5 @@
 #include "connection.hpp"
 
-Connection::Start() {
+void Connection::Start() {
     
 }

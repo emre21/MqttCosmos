@@ -1,13 +1,32 @@
 cmake_minimum_required(VERSION 3.15)
+set(PROJ_NAME "MqttCosmos")
+project({PROJ_NAME})
+enable_testing()
+include(CTest)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#https://google.github.io/googletest/quickstart-cmake.html
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+         URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+#set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+#set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+#set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+#set(BUILD_GTEST ON CACHE BOOL "" FORCE)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
+include(GoogleTest)
 
 set(BOOST_ROOT "C:\\Development\\ThirdpartyLibs\\boost_1_83_0")
 set(BOOST_INCLUDEDIR "C:\\Development\\ThirdpartyLibs\\boost_1_83_0\\boost")
 set(BOOST_LIBRARYDIR "C:\\Development\\ThirdpartyLibs\\boost_1_83_0\\lib64-msvc-14.3")
 set(spdlog_DIR "C:\\Development\\ThirdpartyLibs\\spdlog\\build")
 
-set(CMAKE_CXX_STANDARD 20)
-set(PROJ_NAME "MqttCosmos")
+
 set(MQTT_COSMOS_INC_DIRS 
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mqtt")
@@ -23,7 +42,7 @@ set(MQTT_COSMOS_SRC
     )
 
 
-project({PROJ_NAME})
+
 
 
 

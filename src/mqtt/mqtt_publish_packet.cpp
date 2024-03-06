@@ -15,13 +15,13 @@ const std::span<uint8_t>& MqttPublishPacket::GetMessage()
     return payload_.message;
 }
 
-void MqttPublishPacket::SetPacketData(const std::vector<uint8_t>& packetData)
+void MqttPublishPacket::SetPacketData(const std::span<uint8_t>& packetData)
 {
     packetData_ = packetData;
 }
 
 
-const std::vector<uint8_t> &MqttPublishPacket::GetPacketData()
+const std::span<uint8_t> &MqttPublishPacket::GetPacketData()
 {
     return packetData_;
 }

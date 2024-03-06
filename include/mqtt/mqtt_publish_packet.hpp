@@ -11,8 +11,8 @@ public:
     uint16_t GetMessageIdentifier();
     const std::span<uint8_t>& GetMessage();
 
-    void SetPacketData(const std::vector<uint8_t>& packetData) override;
-    const std::vector<uint8_t>& GetPacketData() override; 
+    void SetPacketData(const std::span<uint8_t>& packetData) override;
+    const std::span<uint8_t>& GetPacketData() override; 
 
 private:
     void Parse();
