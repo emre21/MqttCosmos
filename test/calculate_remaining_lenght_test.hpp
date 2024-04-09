@@ -16,7 +16,7 @@ TEST(CalculateRemaningLenght,_1_BYTE_TEST) {
     //ASSERT_EQ(state_3.value(), 128);
 }
 
-/*
+
 TEST(CalculateRemaningLenght,_2_BYTE_TEST) {
     auto state_1 = CalculateRemaningLenght(129,2);
     //ASSERT_EQ(state_1.value(),127);
@@ -28,4 +28,3 @@ TEST(CalculateRemaningLenght,_2_BYTE_TEST) {
     //ASSERT_EQ(state_3.value(),128);
 
 }
-*/

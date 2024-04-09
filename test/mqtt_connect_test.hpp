@@ -35,7 +35,7 @@ TEST(MqttPacketTest,Connect) {
     std::memcpy(&fixheader,connect_packet.data(),sizeof(fixheader));
 
     auto x = CalculateRemaningLenght(fixheader.remainingLength);
-    std::cout <<connect_packet.size()<<"--"<<x.value();
+    //std::cout <<connect_packet.size()<<"--"<<x.value();
     ASSERT_EQ(x.value(),connect_packet.size() -2 );
     ASSERT_EQ(fixheader.messageType,static_cast<uint8_t>(MessageType::CONNECT));
 
