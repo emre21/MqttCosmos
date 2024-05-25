@@ -11,7 +11,7 @@
 class MqttSubscribePacket : public MqttBasePacket {
 
 public:
-    MqttSubscribePacket(FixedHeader header, std::span<uint8_t>& packetData) : MqttBasePacket(header, packetData) {}
+    MqttSubscribePacket(FixedHeader header, std::span<uint8_t>& packetData) : MqttBasePacket(header, packetData) { Parse(); }
     uint16_t GetMessageIdentifier();
     std::vector<std::pair<Topic,uint8_t>> GetSubcribeDatas();
     void SetPacketData(const std::span<uint8_t>& packetData) override;

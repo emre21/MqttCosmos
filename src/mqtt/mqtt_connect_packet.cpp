@@ -5,13 +5,13 @@
 MqttConnectPacket::MqttConnectPacket(FixedHeader header, std::span<uint8_t> &buffer)
     : MqttBasePacket(header, buffer)
 {
-    std::cout << "->" << std::endl;
-    for (const auto &i : buffer)
-    {
-        std::cout << "->" << i;
-    }
-    std::cout << "->" << std::endl;
-    Parse();
+//    std::cout << "->" << std::endl;
+//    for (const auto &i : buffer)
+//    {
+//        std::cout << "->" << i;
+//    }
+//    std::cout << "->" << std::endl;
+     Parse();
 }
 
 std::optional<std::u8string> MqttConnectPacket::GetUserNameFromPacket() const
@@ -61,14 +61,14 @@ void MqttConnectPacket::Parse()
     const auto sizeofVariableHeader = sizeof(variableHeader_);
     spdlog::info("connect packet variable header size {}", sizeofVariableHeader);
     std::memcpy(&variableHeader_, packetData_.data(), sizeofVariableHeader);
-    std::cout << "->" << std::endl;
+    //std::cout << "->" << std::endl;
     for (const auto &i : packetData_)
     {
         std::cout << "->" << i;
     }
-    std::cout << "->" << std::endl;
-    std::cout << "-------+" << std::string(variableHeader_.protocolName) << '\n';
-    std::cout << "-------+" << int(variableHeader_.keepAliveTimer.value()) << '\n';
+    //std::cout << "->" << std::endl;
+    //std::cout << "-------+" << std::string(variableHeader_.protocolName) << '\n';
+    //std::cout << "-------+" << int(variableHeader_.keepAliveTimer.value()) << '\n';
 
     std::span<uint8_t> payloadBuffer(packetData_.begin() + sizeofVariableHeader, packetData_.end());
     payload_.Parse(variableHeader_, payloadBuffer);
