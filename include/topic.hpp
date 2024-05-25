@@ -15,7 +15,7 @@ public:
         FromVector(begin,end);
     }
     */
-    explicit Topic(const std::span<uint8_t>& bufferRef) noexcept 
+    Topic(const std::span<uint8_t>& bufferRef) noexcept 
     {
         FromSpan(bufferRef);
     }

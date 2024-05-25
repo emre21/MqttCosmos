@@ -214,18 +214,24 @@ template <> struct Payload<MessageType::SUBSCRIBE>
   public:
     struct SubscribeDataUnit
     {
-        boost::endian::big_uint16_t topicLength;
+        uint16_t topicLength;
         Topic topic;
         uint8_t requestedQos;
     };
+    uint16_t filterLSB = 0x00FF;
+    uint16_t filterMSB = 0xFF00;
+
+    uint16_t Convert2littleEndian(uint16_t bigEndian) {
+        return ((bigEndian & filterMSB) >> 8) | ((bigEndian & filterLSB) << 8);
+    }
 
     void Parse(std::span<uint8_t> &buffer)
     {
         using buffer_iterator = std::span<uint8_t>::iterator;
 
-        auto UnitParser = [](buffer_iterator begin, boost::endian::big_uint16_t topicLength) -> SubscribeDataUnit {
+        auto UnitParser = [&](buffer_iterator begin, uint16_t topicLength) -> SubscribeDataUnit {
             auto beginTopic = begin;
-            auto endTopic = beginTopic + ConverToUint16(topicLength);
+            auto endTopic = beginTopic +  topicLength;
             auto requestedQos = *(endTopic + SIZE_OF_UINT8);
             std::span<uint8_t> topic(beginTopic, endTopic);
             return SubscribeDataUnit{topicLength, Topic(topic), requestedQos};
@@ -234,12 +240,19 @@ template <> struct Payload<MessageType::SUBSCRIBE>
         auto begin = buffer.begin();
         for (std::size_t i = 0; i < buffer.size();)
         {
-            if (i + SIZE_OF_BUINT16 >= buffer.size())
-                break;
-            boost::endian::big_uint16_t topicLenght;
-            std::memcpy(&topicLenght, &buffer[i], SIZE_OF_BUINT16);
-            payloadData.push_back(UnitParser(begin, topicLenght));
-            i += SIZE_OF_BUINT16 + ConverToUint16(topicLenght) + SIZE_OF_UINT8;
+            //if (i + SIZE_OF_BUINT16 >= buffer.size())
+            //    break;
+            //boost::endian::big_uint16_t topicLenght;
+            // begin need increase
+            uint16_t topicLenght = (buffer[i] << 8) | buffer[i + 1];
+            //std::memcpy(&topicLenght, &(buffer[i]), SIZE_OF_BUINT16);
+            auto beginTopic = begin+2;
+            auto endTopic = beginTopic + topicLenght;
+            auto requestedQos = *(endTopic + SIZE_OF_UINT8);
+            std::span<uint8_t> topic(beginTopic, topicLenght);
+            //std::cout << i << "." << " length :" << ConverToUint16(topicLenght)<< '\n';
+            payloadData.push_back(SubscribeDataUnit{topicLenght,topic,requestedQos});
+            i += SIZE_OF_BUINT16 + topicLenght + SIZE_OF_UINT8;
         }
     }
 
