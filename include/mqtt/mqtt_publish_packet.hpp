@@ -7,6 +7,7 @@
 
 class MqttPublishPacket : public MqttBasePacket {
 public:
+    MqttPublishPacket(FixedHeader header, std::span<uint8_t>& packetData) : MqttBasePacket(header, packetData) { Parse(); }
     const Topic& GetTopic();
     uint16_t GetMessageIdentifier();
     const std::span<uint8_t>& GetMessage();

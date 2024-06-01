@@ -85,17 +85,18 @@ template <> struct VariableHeader<MessageType::PUBLISH>
     {
         std::memcpy(&topicSize, buffer.data(), SIZE_OF_BUINT16);
         std::span<uint8_t>::iterator topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
-        std::span<uint8_t>::iterator topicEndPos = topicStartPos + ConverToUint16(topicSize);
+        auto topicLength = (topicSize.data()[0] << 8) | (topicSize.data()[1] << 1);
+        std::span<uint8_t>::iterator topicEndPos = topicStartPos + topicLength;
         std::span<uint8_t> bufferRef(topicStartPos, topicEndPos);
         topic.FromSpan(bufferRef);
         if (fixedHeader.qosLevel == 1 || fixedHeader.qosLevel == 2)
         {
             std::memcpy(&messageIdentifier, topicEndPos._Mybegin, SIZE_OF_BUINT16);
-            payloadStartPos = SIZE_OF_BUINT16 + ConverToUint16(topicSize) + SIZE_OF_BUINT16;
+            payloadStartPos = SIZE_OF_BUINT16 + topicLength + SIZE_OF_BUINT16;
         }
         else
         {
-            payloadStartPos = SIZE_OF_BUINT16 + ConverToUint16(topicSize);
+            payloadStartPos = SIZE_OF_BUINT16 + topicLength;
         }
     }
 };
