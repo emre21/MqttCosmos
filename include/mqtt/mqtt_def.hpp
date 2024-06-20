@@ -16,7 +16,7 @@ enum class MessageType : uint8_t
 {
     RESERVED_START = 0,
     CONNECT,
-    CONNACT,
+    CONNACK,
     PUBLISH,
     PUBACK,
     PUBREC,
@@ -68,7 +68,7 @@ template <> struct VariableHeader<MessageType::CONNECT>
 
 // Variable Headers
 
-template <> struct VariableHeader<MessageType::CONNACT>
+template <> struct VariableHeader<MessageType::CONNACK>
 {
     uint8_t reserved;
     uint8_t returnCode;
