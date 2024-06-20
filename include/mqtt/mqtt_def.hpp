@@ -85,7 +85,7 @@ template <> struct VariableHeader<MessageType::PUBLISH>
     {
         std::memcpy(&topicSize, buffer.data(), SIZE_OF_BUINT16);
         std::span<uint8_t>::iterator topicStartPos = buffer.begin() + SIZE_OF_BUINT16;
-        auto topicLength = (topicSize.data()[0] << 8) | (topicSize.data()[1] << 1);
+        auto topicLength = (topicSize.data()[0] << 8) | (topicSize.data()[1] << 0);
         std::span<uint8_t>::iterator topicEndPos = topicStartPos + topicLength;
         std::span<uint8_t> bufferRef(topicStartPos, topicEndPos);
         topic.FromSpan(bufferRef);

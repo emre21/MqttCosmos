@@ -39,6 +39,11 @@ TEST(PUBLISH_PACKET_TEST, PARSE) {
 	}
 	std::span<uint8_t> packetData(publishData.begin() + 2, remainingLength.value());
 	MqttPublishPacket packet(fixedHeader, packetData);
+	auto topic = packet.GetTopic();
 	auto messageID = packet.GetMessageIdentifier();
 	auto message = packet.GetMessage();
+	std::vector<uint8_t> topicVec{ 'a','/','b' };
+	auto topicCheck = topic == Topic(std::span<uint8_t>(topicVec.begin(), topicVec.end()));
+	ASSERT_EQ(topicCheck, true);
+	ASSERT_EQ(std::u8string(u8"emre") == std::u8string(message.begin(), message.end()), true);
 }
