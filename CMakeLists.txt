@@ -39,7 +39,9 @@ set(MQTT_COSMOS_SRC
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_connect_packet.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_subscribe_packet.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_publish_packet.cpp
-    )
+    ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_connack_packet.cpp
+    ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_puback_packet.cpp
+)
 
 
 
