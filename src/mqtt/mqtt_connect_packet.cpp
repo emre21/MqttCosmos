@@ -40,7 +40,7 @@ uint16_t MqttConnectPacket::GetKeepAliveTimerSeconds()
 
 void MqttConnectPacket::SetPacketData(const std::span<uint8_t> &packetData)
 {
-    // packetData_ = packetData;
+    packetData_ = packetData;
 }
 
 const std::span<uint8_t> &MqttConnectPacket::GetPacketData()
