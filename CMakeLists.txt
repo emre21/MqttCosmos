@@ -41,6 +41,9 @@ set(MQTT_COSMOS_SRC
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_publish_packet.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_connack_packet.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_puback_packet.cpp
+    ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_pubrec_packet.cpp
+    ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_pubrel_packet.cpp
+    ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_pubcomp_packet.cpp
 )
 
 
@@ -62,7 +65,7 @@ include_directories(
 )
 
 
-add_executable(${PROJ_NAME} ${MQTT_COSMOS_SRC})
+add_executable(${PROJ_NAME} ${MQTT_COSMOS_INC_DIRS} ${MQTT_COSMOS_SRC})
 target_link_libraries(${PROJ_NAME} ${Boost_LIBRARY_DIR} spdlog::spdlog) 
 #
 
