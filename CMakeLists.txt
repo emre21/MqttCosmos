@@ -44,6 +44,8 @@ set(MQTT_COSMOS_SRC
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_pubrec_packet.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_pubrel_packet.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_pubcomp_packet.cpp
+    ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_unsuback_packet.cpp
+    ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_unsubscribe_packet.cpp
 )
 
 
