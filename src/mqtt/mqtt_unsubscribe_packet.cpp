@@ -22,7 +22,7 @@ void MqttUnSubscribePacket::SetPacketData(const std::span<uint8_t>& packetData)
     Parse();
 }
 
-const std::span<uint8_t>& MqttUnSubcribePacket::GetPacketData()
+const std::span<uint8_t>& MqttUnSubscribePacket::GetPacketData()
 {
     return packetData_;
 }
