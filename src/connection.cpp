@@ -23,7 +23,6 @@ std::unordered_map<MessageType, std::function<void(void)>> handlers
     {MessageType::PINGREQ,      InvalidHandler},
     {MessageType::PINGRESP,     InvalidHandler},
     {MessageType::DISCONNECT,   InvalidHandler},
-
 };
 
 void Connection::Start() {
@@ -34,4 +33,8 @@ void Connection::Start() {
     }
 }
 
-FixedHeader ReadFixedHeader() { return FixedHeader{}; }
+FixedHeader Connection::ReadFixedHeader() { 
+    FixedHeader fixedHeader;
+    sock_.read_some(io::mutable_buffer( & fixedHeader, 2));
+    return fixedHeader;
+}

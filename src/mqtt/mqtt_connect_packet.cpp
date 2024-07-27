@@ -2,7 +2,7 @@
 #include <boost/endian/conversion.hpp>
 #include <iostream>
 #include <spdlog/spdlog.h>
-MqttConnectPacket::MqttConnectPacket(FixedHeader header, std::span<uint8_t> &buffer)
+MqttConnectPacket::MqttConnectPacket(const FixedHeader& header, std::span<uint8_t> &buffer)
     : MqttBasePacket(header, buffer)
 {
      Parse();
@@ -18,7 +18,7 @@ std::optional<std::u8string> MqttConnectPacket::GetPassword() const
     return payload_.password.data;
 }
 
-std::optional<std::u8string> MqttConnectPacket::GetMessage() const
+std::optional<std::u8string> MqttConnectPacket::GetMessageFromPayload() const
 {
     return payload_.message.data;
 }

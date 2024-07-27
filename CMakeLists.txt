@@ -35,6 +35,7 @@ set(MQTT_COSMOS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/mqtt/mqtt_helper_funcs.hpp
     ${MQTT_COSMOS_SRC_DIR}/main.cpp
     ${MQTT_COSMOS_SRC_DIR}/connection.cpp
+    ${MQTT_COSMOS_SRC_DIR}/mqtt_handlers.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_helper_funcs.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_connect_packet.cpp
     ${MQTT_COSMOS_SRC_DIR}/mqtt/mqtt_subscribe_packet.cpp
