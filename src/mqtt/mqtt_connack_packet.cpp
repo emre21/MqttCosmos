@@ -7,7 +7,7 @@ namespace
 	constexpr auto SIZE_OF_CONNACT_PACKET = 4;
 }
 
-MqttConnackPacket::MqttConnackPacket(CONNACK_RESPONSE response) 
+MqttConnackPacket::MqttConnackPacket(ConnackResponse response) 
 {
 	variableHeader_.returnCode = static_cast<uint8_t>(response);
 }

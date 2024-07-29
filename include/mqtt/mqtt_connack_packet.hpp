@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <mqtt_def.hpp>
 
-enum class CONNACK_RESPONSE : uint8_t {
+enum class ConnackResponse : uint8_t {
 	CONNECTION_ACCEPTED				= 0,
 	UNACCEPTABLE_PROTOCOL_VERSION	= 1,
 	IDENTIFIER_REJECTED				= 2,
@@ -14,7 +14,8 @@ enum class CONNACK_RESPONSE : uint8_t {
 };
 
 class MqttConnackPacket {
-	MqttConnackPacket(CONNACK_RESPONSE response);
+public:
+	MqttConnackPacket(ConnackResponse response);
 	std::vector<uint8_t> ToVector() const;
 private:
 	FixedHeader fixedHeader_{

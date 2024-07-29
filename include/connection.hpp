@@ -27,6 +27,7 @@ public:
     void SetClientID(const std::u8string& clientID) { clientID_ = clientID; }
     void SetUserName(const std::u8string& userName) { userName_ = userName; }
     void SetPassword(const std::u8string& password) { password_ = password; }
+    std::u8string GetClientId() const { return clientID_; }
     void Start();
     void CloseConnection() { sock_.close(); }
     void StartKeepAliveTimer(uint16_t second) { 
