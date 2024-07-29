@@ -7,10 +7,10 @@
 class MqttConnectPacket : public MqttBasePacket
 {
   public:
-    MqttConnectPacket(FixedHeader header, std::span<uint8_t> &buffer);
+    MqttConnectPacket(const FixedHeader& header, std::span<uint8_t> &buffer);
     std::optional<std::u8string> GetUserNameFromPacket() const;
     std::optional<std::u8string> GetPassword() const;
-    std::optional<std::u8string> GetMessage() const;
+    std::optional<std::u8string> GetMessageFromPayload() const;
     std::optional<std::u8string> GetTopic() const;
     std::optional<std::u8string> GetClientId() const;
     uint16_t GetKeepAliveTimerSeconds();

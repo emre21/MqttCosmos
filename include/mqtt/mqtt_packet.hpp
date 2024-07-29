@@ -10,10 +10,12 @@
 class MqttBasePacket
 {
   public:
-    MqttBasePacket(FixedHeader fixedHeader, std::span<uint8_t> &packetData)
+    MqttBasePacket(const FixedHeader& fixedHeader, std::span<uint8_t> &packetData)
         : fixedHeader_(fixedHeader), packetData_(packetData)
     {
     }
+
+    MqttBasePacket& operator=(const MqttBasePacket& packet) = default;
     const FixedHeader &GetFixedHeader()
     {
         return fixedHeader_;

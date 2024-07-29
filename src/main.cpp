@@ -1,14 +1,25 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <boost/asio.hpp>
+#include <cstdint>,
 
-//#include "server.hpp"
+#include "server.hpp"
+
+namespace {
+	constexpr uint16_t PORT = 12345;
+}
 
 int main() {
-//    boost::asio::io_context ctx;
-//    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address_v4::any(),1235);
-//    Server s(ctx,ep);
-//    s.start();
-      spdlog::info("Hello world");
-//    ctx.run();
+	spdlog::info("MqttCosmos Start");
+	boost::asio::io_context ctx;
+	boost::asio::io_service::work idle(ctx);
+
+	spdlog::info("context start");
+	
+	Server server(ctx, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT));
+	spdlog::info("Server init");
+	server.start();
+	ctx.run();
+
+
 }

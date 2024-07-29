@@ -6,6 +6,8 @@
 
 class MqttPubRelPacket : public MqttBasePacket {
 public:
+    MqttPubRelPacket(const FixedHeader& fixHeader,std::span<uint8_t>& packetData) 
+        : MqttBasePacket(fixHeader,packetData){}
     void SetPacketData(const std::span<uint8_t>& packetData) override;
     const std::span<uint8_t>& GetPacketData() override;
 private:
